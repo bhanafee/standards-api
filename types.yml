@@ -1,0 +1,90 @@
+openapi: '3.0.2'
+info:
+  title: Artifact common
+  version: '1.0'
+  contact:
+    name: Brian Hanafee
+    email: bhanafee@gmail.com
+    url: https://hanafee.com
+components:
+  schemas:
+    Packaging:
+      description: Packaging system for artifacts
+      type: string
+      enum: [maven, nuget, pip, conda, apt, yum]
+    Artifact:
+      description: Identifier for an artifact
+      minLength: 2
+      maxLength: 30
+      pattern: '\w+(\.\w+)*'
+      example: "Json.NET"
+    Version:
+      description: Version of an artifact using semantic versioning syntax
+      type: string
+      minLength: 1
+      maxLength: 80
+      pattern: '\d+(.\d+(.\d+(\-\w+)?)?)?'
+      example: "1.0.3-beta"
+    Applies:
+      description: Version range(s) for an artifact
+      type: array
+      items:
+        type: object
+        properties:
+          from:
+            $ref: '#/components/schemas/Version'
+          to:
+            $ref: '#/components/schemas/Version'
+    Message:
+      description: Generic human-readable message
+      type: string
+      maxLength: 80
+      example: An unknown error occurred
+  responses:
+    ArtifactNotFound:
+      description: The artifact version is unrecognized
+      content:
+        text/plain:
+          schema:
+            $ref: '#/components/schemas/Message'
+    Unexpected:
+      description: Unexpected error
+      content:
+        text/plain:
+          schema:
+            $ref: '#/components/schemas/Message'
+  parameters:
+    packagingParam:
+      name: packaging
+      description: The type of repository that contains artifacts
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/Packaging'
+    artifactParam:
+        name: artifact
+        description: Identifies an artifact within a repository
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Artifact'
+    versionParam:
+        name: version
+        description: Version number of an artifact
+        in: path
+        required: true
+        schema:
+            $ref: '#/components/schemas/Version'
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+paths:
+  /:
+    get:
+      summary: Unused root operation
+      operationId: RootURL
+      tags: [artifact]
+      responses:
+        default:
+          $ref: '#/components/responses/Unexpected'

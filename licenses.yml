@@ -1,0 +1,64 @@
+openapi: '3.0.2'
+info:
+  title: Artifact licenses
+  version: '1.0'
+  contact:
+    name: Brian Hanafee
+    email: bhanafee@gmail.com
+    url: https://hanafee.com
+servers:
+  - url: https://api.server.test/v1
+components:
+  schemas:
+    License:
+      description: License for use of an artifact
+      type: object
+      required:
+        - license
+      properties:
+        license:
+          description: Name of the license
+          type: string
+          minLength: 3
+          maxLength: 30
+          pattern: '[\w\s]+'
+          example: Apache 2
+        applies:
+          $ref: 'types.yml#/components/schemas/Applies'
+        url:
+          description: Link to the full license text
+          type: string
+          format: uri
+paths:
+  /licenses/{packaging}/{artifact}/{version}:
+    parameters:
+      - $ref: 'types.yml#/components/parameters/packagingParam'
+      - $ref: 'types.yml#/components/parameters/artifactParam'
+      - $ref: 'types.yml#/components/parameters/versionParam'
+    get:
+      description: Licenses that may be applied to an artifact
+      operationId: getLicenses
+      tags: [artifact, license]
+      responses:
+        '200':
+          description: The artifact version is recognized and license information is in the body
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/License'
+            application/xml:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/License'
+                xml:
+                  wrapped: true
+                  name: licenses
+        '204':
+          description: The artifact version is recognized and does not have any known licenses
+        '404':
+          $ref: 'types.yml#/components/responses/ArtifactNotFound'
+        default:
+          $ref: 'types.yml#/components/responses/Unexpected'

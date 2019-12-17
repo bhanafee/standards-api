@@ -1,0 +1,78 @@
+openapi: '3.0.2'
+info:
+  title: Artifact vulnerabilities
+  version: '1.0'
+  contact:
+    name: Brian Hanafee
+    email: bhanafee@gmail.com
+    url: https://hanafee.com
+servers:
+  - url: https://api.server.test/v1
+components:
+  schemas:
+    Vulnerability:
+      description: Known vulnerability
+      type: object
+      properties:
+        name:
+          description: Identifies the vulnerability. At least one of name or CVE must be present.
+          type: string
+          minLength: 5
+          maxLength: 30
+        cve:
+          description: The CVE identifier for the vulnerability. At least one of name or CVE must be present.
+          type: string
+          minLength: 13
+          maxLength: 20
+          pattern: '^CVE\-\d{4}\-\d{4,}$'
+        applies:
+          $ref: 'types.yml#/components/schemas/Applies'
+        discovered:
+          description: |
+            The date the vulnerability was discovered. There may be some subjectivity
+            to selecting the value. Generally this field is used to determine the effective
+            age of the vulnerability.
+          type: string
+          format: date
+        score:
+          description: The threat score on a scale of 0-10
+          type: number
+          minimum: 0
+          maximum: 10
+        url:
+          description: Location of details about the vulnerability
+          type: string
+          format: uri
+paths:
+  /vulnerabilities/{packaging}/{artifact}/{version}:
+    parameters:
+      - $ref: 'types.yml#/components/parameters/packagingParam'
+      - $ref: 'types.yml#/components/parameters/artifactParam'
+      - $ref: 'types.yml#/components/parameters/versionParam'
+    get:
+      description: Whether an artifact version has known vulnerabilities
+      operationId: getVulnerabilities
+      tags: [artifact, vulnerability]
+      responses:
+        '200':
+          description: The artifact version is recognized and vulnerability information is in the body
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Vulnerability'
+            application/xml:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Vulnerability'
+                xml:
+                  wrapped: true
+                  name: vulnerabilities
+        '204':
+          description: The artifact version is recognized and does not have any known vulnerabilities
+        '404':
+          $ref: 'types.yml#/components/responses/ArtifactNotFound'
+        default:
+          $ref: 'types.yml#/components/responses/Unexpected'

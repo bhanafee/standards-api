@@ -1,0 +1,72 @@
+openapi: '3.0.2'
+info:
+  title: Artifact standardization
+  version: '1.0'
+  contact:
+    name: Brian Hanafee
+    email: bhanafee@gmail.com
+    url: https://hanafee.com
+servers:
+  - url: https://api.server.test/v1
+components:
+  schemas:
+    Standardization:
+      description: Standardized usage of an artifact
+      type: object
+      required:
+        - disposition
+      properties:
+        disposition:
+          type: string
+          enum: [Not Evaluated, NonStandard, Evaluation, Restricted, Standard]
+        usage:
+          type: string
+        sunset:
+          type: string
+          format: date
+        versions:
+          type: array
+          items:
+            type: object
+            properties:
+              lifecycle:
+                type: string
+                enum: [R&D, Mainstream, Deprecated, Obsolete]
+              blacklisted:
+                type: boolean
+              eol:
+                type: string
+                format: date
+              applies:
+                $ref: 'types.yml#/components/schemas/Applies'
+paths:
+  /standard/{packaging}/{artifact}/{version}:
+    parameters:
+      - $ref: 'types.yml#/components/parameters/packagingParam'
+      - $ref: 'types.yml#/components/parameters/artifactParam'
+      - $ref: 'types.yml#/components/parameters/versionParam'
+    get:
+      description: Whether an artifact version is standard
+      operationId: getStandards
+      tags: [artifact, standard]
+      responses:
+        '200':
+          description: The artifact version is recognized and the standardization information is in the body
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Standardization'
+            application/xml:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Standardization'
+                xml:
+                  wrapped: true
+                  name: standards
+        '404':
+          $ref: 'types.yml#/components/responses/ArtifactNotFound'
+        default:
+          $ref: 'types.yml#/components/responses/Unexpected'

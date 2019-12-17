@@ -1,0 +1,136 @@
+openapi: '3.0.2'
+info:
+  title: Bill of materials for a dependency
+  version: '1.0'
+servers:
+  - url: https://api.server.test/v1
+components:
+  schemas:
+    Dependency:
+      description: |
+        Dependencies of an artifact.
+        Artifact and version are required. Packaging should be included only if different than parent.
+      type: object
+      required:
+        - artifact
+        - version
+      properties:
+        packaging:
+          $ref: 'types.yml#/components/schemas/Packaging'
+        artifact:
+          $ref: 'types.yml#/components/schemas/Artifact'
+        version:
+          $ref: 'types.yml#/components/schemas/Version'
+        dependencies:
+          type: array
+          items:
+            $ref: '#/components/schemas/Dependency'
+paths:
+  /dependencies:
+    get:
+      description: The nested dependency graph based on a source repository
+      operationId: sourceDependencies
+      tags: [source, dependency]
+      parameters:
+        - name: source
+          description: URL of a source repository
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uri
+        - name: language
+          description: Expected language of the referenced source code
+          in: query
+          required: false
+          schema:
+            type: string
+            minLength: 2
+            maxLength: 30
+            example: c++
+        - name: tool
+          description: Expected build tool to process the referenced source code
+          in: query
+          required: false
+          schema:
+            type: string
+            minLength: 2
+            maxLength: 30
+            example: gradle
+        - name: packaging
+          description: Expected packaging produced by the referenced source code
+          in: query
+          required: false
+          schema:
+            $ref: 'types.yml#/components/schemas/Packaging'
+      responses:
+        '200':
+          description: The source is analyzed and the dependency information is in the body
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Dependency'
+            application/xml:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Dependency'
+                xml:
+                  wrapped: true
+                  name: dependencies
+        '204':
+          description: The source was analyzed and does not have any known dependencies
+        '303':
+          description: The source matches a known artifact version
+          headers:
+            Location:
+              description: |
+                Location of the artifact dependencies.
+                The URL should reference /dependencies/{packaging}/{artifact}/{version} on this service
+              schema:
+                type: string
+                format: uri
+        '404':
+          description: The source was not found
+          content:
+            text/plain:
+              schema:
+                $ref: 'types.yml#/components/schemas/Message'
+        '501':
+          description: The source was found, but is not a type that this service knows how to analyze
+        default:
+          $ref: 'types.yml#/components/responses/Unexpected'
+  /dependencies/{packaging}/{artifact}/{version}:
+    parameters:
+      - $ref: 'types.yml#/components/parameters/packagingParam'
+      - $ref: 'types.yml#/components/parameters/artifactParam'
+      - $ref: 'types.yml#/components/parameters/versionParam'
+    get:
+      description: The nested dependency graph for a packaged artifact
+      operationId: artifactDependencies
+      tags: [artifact, dependency]
+      responses:
+        '200':
+          description: The artifact version is recognized and the dependency information is in the body
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Dependency'
+            application/xml:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Dependency'
+                xml:
+                  wrapped: true
+                  name: dependencies
+        '204':
+          description: The artifact version is recognized and does not have any known dependencies
+        '404':
+          $ref: 'types.yml#/components/responses/ArtifactNotFound'
+        default:
+          $ref: 'types.yml#/components/responses/Unexpected'
