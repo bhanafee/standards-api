@@ -10,21 +10,10 @@ servers:
   - url: https://api.server.test/v1
 components:
   schemas:
-    Vulnerability:
-      description: Known vulnerability
+    VulnerabilityCommon:
+      description: Common metadata about a known vulnerability
       type: object
       properties:
-        name:
-          description: Identifies the vulnerability. At least one of name or CVE must be present.
-          type: string
-          minLength: 5
-          maxLength: 30
-        cve:
-          description: The CVE identifier for the vulnerability. At least one of name or CVE must be present.
-          type: string
-          minLength: 13
-          maxLength: 20
-          pattern: '^CVE\-\d{4}\-\d{4,}$'
         applies:
           $ref: 'types.yml#/components/schemas/Applies'
         discovered:
@@ -43,6 +32,33 @@ components:
           description: Location of details about the vulnerability
           type: string
           format: uri
+    Published:
+      allOf:
+        - $ref: '#/components/schemas/VulnerabilityCommon'
+        - type: object
+          required: [cve]
+          properties:
+            cve:
+              description: The CVE identifier for the vulnerability.
+              type: string
+              minLength: 13
+              maxLength: 20
+              pattern: '^CVE\-\d{4}\-\d{4,}$'
+    Unpublished:
+      allOf:
+        - $ref: '#/components/schemas/VulnerabilityCommon'
+        - type: object
+          required: [name]
+          properties:
+            name:
+              description: Local identifier for the vulnerability.
+              type: string
+              minLength: 5
+              maxLength: 30
+    Vulnerability:
+      anyOf:
+        - $ref: '#/components/schemas/Published'
+        - $ref: '#/components/schemas/Unpublished'
 paths:
   /vulnerabilities/{packaging}/{artifact}/{version}:
     parameters:
