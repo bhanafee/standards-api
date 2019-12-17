@@ -29,12 +29,14 @@ components:
       description: Version range(s) for an artifact
       type: array
       items:
-        type: object
-        properties:
-          from:
-            $ref: '#/components/schemas/Version'
-          to:
-            $ref: '#/components/schemas/Version'
+        oneOf:
+          - $ref: '#/components/schemas/Version'
+          - type: object
+            properties:
+              from:
+                $ref: '#/components/schemas/Version'
+              to:
+                $ref: '#/components/schemas/Version'
     Message:
       description: Generic human-readable message
       type: string
