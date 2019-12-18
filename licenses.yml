@@ -29,7 +29,41 @@ components:
           description: Link to the full license text
           type: string
           format: uri
+  responses:
+    Licenses:
+      description: The artifact is recognized and license information is in the body
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/License'
+        application/xml:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/License'
+            xml:
+              wrapped: true
+              name: licenses
 paths:
+  /licenses/{packaging}/{artifact}/:
+    parameters:
+      - $ref: 'types.yml#/components/parameters/packagingParam'
+      - $ref: 'types.yml#/components/parameters/artifactParam'
+    get:
+      description: Licenses that may be applied to an artifact
+      operationId: getLicensesForArtifact
+      tags: [artifact, license]
+      responses:
+        '200':
+          $ref: '#/components/responses/Licenses'
+        '204':
+          description: The artifact is recognized and does not have any known licenses
+        '404':
+          $ref: 'types.yml#/components/responses/ArtifactNotFound'
+        default:
+          $ref: 'types.yml#/components/responses/Unexpected'
   /licenses/{packaging}/{artifact}/{version}:
     parameters:
       - $ref: 'types.yml#/components/parameters/packagingParam'
@@ -37,25 +71,11 @@ paths:
       - $ref: 'types.yml#/components/parameters/versionParam'
     get:
       description: Licenses that may be applied to an artifact
-      operationId: getLicenses
+      operationId: getLicensesForArtifactVersion
       tags: [artifact, license]
       responses:
         '200':
-          description: The artifact version is recognized and license information is in the body
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/License'
-            application/xml:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/License'
-                xml:
-                  wrapped: true
-                  name: licenses
+          $ref: '#/components/responses/Licenses'
         '204':
           description: The artifact version is recognized and does not have any known licenses
         '404':

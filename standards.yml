@@ -39,7 +39,39 @@ components:
                 format: date
               applies:
                 $ref: 'types.yml#/components/schemas/Applies'
+  responses:
+    Standards:
+      description: The artifact is recognized and the standardization information is in the body
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/Standardization'
+        application/xml:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/Standardization'
+            xml:
+              wrapped: true
+              name: standards
 paths:
+  /standard/{packaging}/{artifact}/:
+    parameters:
+      - $ref: 'types.yml#/components/parameters/packagingParam'
+      - $ref: 'types.yml#/components/parameters/artifactParam'
+    get:
+      description: Whether an artifact is standard
+      operationId: getStandardsForArtifact
+      tags: [artifact, standard]
+      responses:
+        '200':
+          $ref: '#/components/responses/Standards'
+        '404':
+          $ref: 'types.yml#/components/responses/ArtifactNotFound'
+        default:
+          $ref: 'types.yml#/components/responses/Unexpected'
   /standard/{packaging}/{artifact}/{version}:
     parameters:
       - $ref: 'types.yml#/components/parameters/packagingParam'
@@ -47,25 +79,11 @@ paths:
       - $ref: 'types.yml#/components/parameters/versionParam'
     get:
       description: Whether an artifact version is standard
-      operationId: getStandards
+      operationId: getStandardsForArtifactVersion
       tags: [artifact, standard]
       responses:
         '200':
-          description: The artifact version is recognized and the standardization information is in the body
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Standardization'
-            application/xml:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Standardization'
-                xml:
-                  wrapped: true
-                  name: standards
+          $ref: '#/components/responses/Standards'
         '404':
           $ref: 'types.yml#/components/responses/ArtifactNotFound'
         default:

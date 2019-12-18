@@ -59,7 +59,41 @@ components:
       anyOf:
         - $ref: '#/components/schemas/Published'
         - $ref: '#/components/schemas/Unpublished'
+  responses:
+    Vulnerabilities:
+      description: The artifact  is recognized and vulnerability information is in the body
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/Vulnerability'
+        application/xml:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/Vulnerability'
+            xml:
+              wrapped: true
+              name: vulnerabilities
 paths:
+  /vulnerabilities/{packaging}/{artifact}/:
+    parameters:
+      - $ref: 'types.yml#/components/parameters/packagingParam'
+      - $ref: 'types.yml#/components/parameters/artifactParam'
+    get:
+      description: Whether an artifact version has known vulnerabilities
+      operationId: getVulnerabilitiesForArtifact
+      tags: [artifact, vulnerability]
+      responses:
+        '200':
+          $ref: '#/components/responses/Vulnerabilities'
+        '204':
+          description: The artifact is recognized and does not have any known vulnerabilities
+        '404':
+          $ref: 'types.yml#/components/responses/ArtifactNotFound'
+        default:
+          $ref: 'types.yml#/components/responses/Unexpected'
   /vulnerabilities/{packaging}/{artifact}/{version}:
     parameters:
       - $ref: 'types.yml#/components/parameters/packagingParam'
@@ -67,25 +101,11 @@ paths:
       - $ref: 'types.yml#/components/parameters/versionParam'
     get:
       description: Whether an artifact version has known vulnerabilities
-      operationId: getVulnerabilities
+      operationId: getVulnerabilitiesForArtifactVersion
       tags: [artifact, vulnerability]
       responses:
         '200':
-          description: The artifact version is recognized and vulnerability information is in the body
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Vulnerability'
-            application/xml:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Vulnerability'
-                xml:
-                  wrapped: true
-                  name: vulnerabilities
+          $ref: '#/components/responses/Vulnerabilities'
         '204':
           description: The artifact version is recognized and does not have any known vulnerabilities
         '404':
