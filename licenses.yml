@@ -23,12 +23,12 @@ components:
           maxLength: 30
           pattern: '[\w\s]+'
           example: Apache 2
-        applies:
-          $ref: 'types.yml#/components/schemas/Applies'
         url:
           description: Link to the full license text
           type: string
           format: uri
+        applies:
+          $ref: 'types.yml#/components/schemas/Applies'
   responses:
     Licenses:
       description: The artifact is recognized and license information is in the body

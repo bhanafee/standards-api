@@ -14,8 +14,6 @@ components:
       description: Common metadata about a known vulnerability
       type: object
       properties:
-        applies:
-          $ref: 'types.yml#/components/schemas/Applies'
         discovered:
           description: |
             The date the vulnerability was discovered. There may be some subjectivity
@@ -32,6 +30,8 @@ components:
           description: Location of details about the vulnerability
           type: string
           format: uri
+        applies:
+          $ref: 'types.yml#/components/schemas/Applies'
     Published:
       allOf:
         - $ref: '#/components/schemas/VulnerabilityCommon'
