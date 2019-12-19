@@ -23,7 +23,7 @@ components:
       type: string
       minLength: 1
       maxLength: 80
-      pattern: '\d+(.\d+(.\d+(\-\w+)?)?)?'
+      pattern: '\d+(.\d+(.\d+)?)?(\-[\w\.]+)?(\+[\w\.]+)?'
       example: "1.0.3-beta"
     Applies:
       description: Version range(s) for an artifact
@@ -63,6 +63,13 @@ components:
       required: true
       schema:
         $ref: '#/components/schemas/Packaging'
+      examples:
+        NuGet:
+          value: "nuget"
+          summary: "NuGet repository"
+        Maven:
+          value: "maven"
+          summary: "Maven repository"
     artifactParam:
         name: artifact
         description: Identifies an artifact within a repository
@@ -70,6 +77,13 @@ components:
         required: true
         schema:
           $ref: '#/components/schemas/Artifact'
+        examples:
+          NuGet:
+            value: "Json.Net"
+            summary: "NuGet artifact id"
+          Maven:
+            value: "org.slf4j,slf4j-api"
+            summary: "Maven groupId and artifactId as an array"
     versionParam:
         name: version
         description: Version number of an artifact
@@ -77,6 +91,28 @@ components:
         required: true
         schema:
             $ref: '#/components/schemas/Version'
+        examples:
+          Major:
+            value: "1"
+            summary: "Major version only"
+          Minor:
+            value: "1.2"
+            summary: "Major and minor version"
+          Patch:
+            value: "1.2.3"
+            summary: "Major, minor and patch version"
+          Beta:
+            value: "1.2.3-beta1"
+            summary: "Beta patch version"
+          Snapshot:
+            value: "1.2.3-SNAPSHOT"
+            summary: "Latest snapshot version"
+          Build:
+            value: "1.2.3+build.456"
+            summary: "Patch with build information"
+          All:
+            value: "1.2.3-beta4.5+build.6.7"
+            summary: "Pre-release with detailed build information"
   securitySchemes:
     BasicAuth:
       type: http
