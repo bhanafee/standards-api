@@ -1,6 +1,8 @@
 openapi: '3.0.2'
 info:
   title: Artifact vulnerabilities
+  description: |
+    Check whether an artifact has known vulnerabilities.
   version: '1.0'
   contact:
     name: Brian Hanafee

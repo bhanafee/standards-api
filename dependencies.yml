@@ -1,7 +1,13 @@
 openapi: '3.0.2'
 info:
   title: Bill of materials for a dependency
+  description: |
+    Analyze a top level artifact to find its dependencies.
   version: '1.0'
+  contact:
+    name: Brian Hanafee
+    email: bhanafee@gmail.com
+    url: https://hanafee.com
 servers:
   - url: https://api.server.test/v1
 components:

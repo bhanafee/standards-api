@@ -1,6 +1,8 @@
 openapi: '3.0.2'
 info:
   title: Artifact standardization
+  description: |
+    Check a database of standards to determine the expected uses of an artifact.
   version: '1.0'
   contact:
     name: Brian Hanafee

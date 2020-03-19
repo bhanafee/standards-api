@@ -1,6 +1,8 @@
 openapi: '3.0.2'
 info:
   title: Artifact licenses
+  description: |
+    Find potential licensing agreements that can be applied to an artifact.
   version: '1.0'
   contact:
     name: Brian Hanafee

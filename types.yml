@@ -19,11 +19,14 @@ components:
       pattern: '\w+(\.\w+)*'
       example: "Json.NET"
     Version:
-      description: Version of an artifact using semantic versioning syntax
+      description: |
+        Version of an artifact using semantic versioning syntax modified to make
+        patch and minor versions optional and allow more flexibility in pre-release
+        and build number information
       type: string
       minLength: 1
       maxLength: 80
-      pattern: '\d+(.\d+(.\d+)?)?(\-[\w\.]+)?(\+[\w\.]+)?'
+      pattern: '^(0|[1-9]\d*)(\.(0|[1-9]\d*)(\.(0|[1-9]\d*))?)?(\-\w(\w\.)+)?(\+\w(\w\.)+)?$'
       example: "1.0.3-beta"
     Applies:
       description: Version range(s) for an artifact
@@ -117,12 +120,4 @@ components:
     BasicAuth:
       type: http
       scheme: basic
-paths:
-  /:
-    get:
-      summary: Unused root operation
-      operationId: RootURL
-      tags: [artifact]
-      responses:
-        default:
-          $ref: '#/components/responses/Unexpected'
+paths: {}
